@@ -15,7 +15,7 @@ export class TouchInput {
   public shieldTriggered: boolean = false;
   public isPlaying: boolean = false;
 
-  private boundListeners: { element: HTMLElement | Window; event: string; fn: EventListener }[] = [];
+  private boundListeners: { element: HTMLElement | Window | Document; event: string; fn: EventListener }[] = [];
 
   public attach(): void {
     const btnLeft = document.getElementById('btn-steer-left');
@@ -25,9 +25,10 @@ export class TouchInput {
     const btnNarrow = document.getElementById('btn-shape-narrow');
     const btnPause = document.getElementById('btn-pause');
     const btnAudio = document.getElementById('btn-audio');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
     const gameContainer = document.getElementById('game-container');
 
-    const addListener = (element: HTMLElement | Window | null, event: string, fn: EventListener) => {
+    const addListener = (element: HTMLElement | Window | Document | null, event: string, fn: EventListener) => {
       if (element) {
         element.addEventListener(event, fn, { passive: false });
         this.boundListeners.push({ element, event, fn });
@@ -126,6 +127,42 @@ export class TouchInput {
         e.preventDefault();
         this.pauseTriggered = true;
       });
+    }
+
+    // Fullscreen button
+    if (btnFullscreen && gameContainer) {
+      addListener(btnFullscreen, 'pointerdown', (e: Event) => {
+        e.preventDefault();
+        try {
+          if (!document.fullscreenElement) {
+            if (gameContainer.requestFullscreen) {
+              gameContainer.requestFullscreen();
+            } else if ((gameContainer as any).webkitRequestFullscreen) {
+              (gameContainer as any).webkitRequestFullscreen();
+            }
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if ((document as any).webkitExitFullscreen) {
+              (document as any).webkitExitFullscreen();
+            }
+          }
+        } catch {
+          // Ignore
+        }
+      });
+
+      const updateFullscreenIcon = () => {
+        if (document.fullscreenElement) {
+          btnFullscreen.textContent = '✕';
+          btnFullscreen.setAttribute('aria-label', 'Exit Fullscreen');
+        } else {
+          btnFullscreen.textContent = '⛶';
+          btnFullscreen.setAttribute('aria-label', 'Enter Fullscreen');
+        }
+      };
+      addListener(document, 'fullscreenchange', updateFullscreenIcon);
+      addListener(document, 'webkitfullscreenchange', updateFullscreenIcon);
     }
 
     // Tap on canvas / game container to start / restart game (ONLY when not playing!)

@@ -222,6 +222,10 @@ export class GameEngine {
 
     const input = this.controls.poll();
 
+    if (input.recenterPressed) {
+      this.vision.recenter();
+    }
+
     if (input.mutePressed) {
       this.audio.toggleMute();
       this.pauseMenu.syncAudioBtn();

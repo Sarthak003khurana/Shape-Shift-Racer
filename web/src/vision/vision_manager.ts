@@ -122,6 +122,9 @@ export class VisionManager {
       onCancelCalibration: () => {
         this.calibration.cancelInteractiveCalibration();
       },
+      onRecenter: () => {
+        this.recenter();
+      },
     });
   }
 
@@ -271,6 +274,23 @@ export class VisionManager {
     }
     this.calibration.startInteractiveCalibration();
     return true;
+  }
+
+  public recenter(): void {
+    if (this.lastVisionState && this.lastVisionState.faceDetected) {
+      const s = this.lastVisionState;
+      this.processor.setBaselines({ baseYaw: s.yawDeg, baseRoll: s.rollDeg });
+      this.calibration.recenter({
+        smileRaw: s.smileRaw,
+        openRaw: s.openRaw,
+        yawDeg: s.yawDeg,
+        rollDeg: s.rollDeg,
+      });
+      this.privacyUI.showStatusBadge('🎯 Head Center Recalibrated!');
+    } else {
+      this.calibration.resetAutoZero();
+      this.privacyUI.showStatusBadge('Looking straight to recalibrate...');
+    }
   }
 
   /**

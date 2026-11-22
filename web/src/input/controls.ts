@@ -16,6 +16,7 @@ export interface InputState {
   pausePressed: boolean;
   mutePressed: boolean;
   restartPressed: boolean;
+  recenterPressed: boolean;
 }
 
 export class ControlsManager {
@@ -115,6 +116,7 @@ export class ControlsManager {
     this.visionJump = false;
     const shieldPressed = this.keyboard.consumeShield() || this.touch.consumeShield() || this.visionShield;
     this.visionShield = false;
+    const recenterPressed = this.keyboard.consumeRecenter();
 
     return {
       targetNormX: Math.max(-0.82, Math.min(0.82, steer)),
@@ -124,6 +126,7 @@ export class ControlsManager {
       pausePressed,
       mutePressed,
       restartPressed,
+      recenterPressed,
     };
   }
 }

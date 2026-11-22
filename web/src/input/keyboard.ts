@@ -13,6 +13,7 @@ export class KeyboardInput {
   public restartTriggered: boolean = false;
   public jumpTriggered: boolean = false;
   public shieldTriggered: boolean = false;
+  public recenterTriggered: boolean = false;
   public isPlaying: boolean = false;
 
   private onKeyDownBound: (e: KeyboardEvent) => void;
@@ -59,6 +60,9 @@ export class KeyboardInput {
       }
       if (e.code === 'KeyJ') {
         this.jumpTriggered = true;
+      }
+      if (e.code === 'KeyC') {
+        this.recenterTriggered = true;
       }
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyE') {
         this.shieldTriggered = true;
@@ -122,6 +126,12 @@ export class KeyboardInput {
     const s = this.shieldTriggered;
     this.shieldTriggered = false;
     return s;
+  }
+
+  public consumeRecenter(): boolean {
+    const c = this.recenterTriggered;
+    this.recenterTriggered = false;
+    return c;
   }
 
   public clearRestart(): void {

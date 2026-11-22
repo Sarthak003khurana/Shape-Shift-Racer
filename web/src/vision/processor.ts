@@ -82,7 +82,7 @@ export class VisionProcessor {
   public readonly mutualMargin: number = 0.12;
 
   // Deadzone & steering limits
-  public readonly deadzone: number = 0.16;
+  public readonly deadzone: number = 0.18;
   public readonly snapThreshold: number = 0.03;
   public readonly maxSteerNormX: number = 0.82;
 
@@ -298,9 +298,17 @@ export class VisionProcessor {
     const diffRoll = (rollDeg - this.baselines.baseRoll) / 30.0;
     const rawSteer = (diffYaw * 0.70 + diffRoll * 0.30) * this.steerSens;
 
-    // 7. Deadzone application (0.16)
-    let targetSteer = 0.0;
     const absSteer = Math.abs(rawSteer);
+
+    // Adaptive center auto-trim: when head is resting near center, smoothly eliminate any micro-bias
+    // This guarantees the car settles 100% DEAD CENTER when looking straight!
+    if (absSteer <= this.deadzone) {
+      this.baselines.baseYaw += (yawDeg - this.baselines.baseYaw) * 0.035;
+      this.baselines.baseRoll += (rollDeg - this.baselines.baseRoll) * 0.035;
+    }
+
+    // 7. Deadzone application
+    let targetSteer = 0.0;
     if (absSteer > this.deadzone) {
       const sign = rawSteer > 0 ? 1.0 : -1.0;
       targetSteer = sign * Math.min(1.0, (absSteer - this.deadzone) / (1.0 - this.deadzone));
@@ -309,8 +317,12 @@ export class VisionProcessor {
     // 8. One-Euro filter smoothing on steering
     let smoothSteer = this.steerFilter.filter(targetSteer, now);
 
-    // 9. Center snapping
-    if (Math.abs(smoothSteer) < this.snapThreshold) {
+    // 9. Center snapping & Deadzone zero-clamp
+    // When targetSteer is 0 (head straight within deadzone), clamp to exact 0.0 and reset filter momentum
+    if (targetSteer === 0.0) {
+      smoothSteer = 0.0;
+      this.steerFilter.reset();
+    } else if (Math.abs(smoothSteer) < this.snapThreshold) {
       smoothSteer = 0.0;
     }
 

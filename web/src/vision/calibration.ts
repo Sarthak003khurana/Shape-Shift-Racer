@@ -123,6 +123,19 @@ export class CalibrationManager {
     this.fastAutoZeroSamples = [];
   }
 
+  public recenter(sample?: FrameSample): void {
+    if (sample) {
+      this.baselines.baseYaw = sample.yawDeg;
+      this.baselines.baseRoll = sample.rollDeg;
+      this.saveCalibration();
+      if (this.callbacks.onFinished) {
+        this.callbacks.onFinished(this.baselines);
+      }
+    } else {
+      this.resetAutoZero();
+    }
+  }
+
   /**
    * Start 3-step interactive calibration wizard.
    */
@@ -243,13 +256,9 @@ export class CalibrationManager {
           const parsed = JSON.parse(raw);
           if (typeof parsed === 'object' && parsed !== null) {
             this.baselines = { ...DEFAULT_BASELINES, ...parsed };
-            // Sanitize against corrupted legacy 180-degree matrix roll
-            if (Math.abs(this.baselines.baseRoll) > 45.0) {
-              this.baselines.baseRoll = 0.0;
-            }
-            if (Math.abs(this.baselines.baseYaw) > 45.0) {
-              this.baselines.baseYaw = 0.0;
-            }
+            // Head pose baselines always reset to 0.0 on new session so past posture or device tilt does not bias steering
+            this.baselines.baseYaw = 0.0;
+            this.baselines.baseRoll = 0.0;
           }
         }
       }

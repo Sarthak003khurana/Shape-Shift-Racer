@@ -12,6 +12,7 @@ export interface PrivacyModalCallbacks {
   onEnableCamera: () => void;
   onSkipCamera: () => void;
   onCancelCalibration?: () => void;
+  onRecenter?: () => void;
 }
 
 export class PrivacyModalUI {
@@ -379,6 +380,8 @@ export class PrivacyModalUI {
     if (!this.container) return;
     this.pipContainer = document.createElement('div');
     this.pipContainer.className = 'ssr-pip-hud';
+    this.pipContainer.title = 'Tap preview to Recenter head pose';
+    this.pipContainer.style.cursor = 'pointer';
 
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'ssr-pip-toggle-btn';
@@ -388,6 +391,17 @@ export class PrivacyModalUI {
       e.stopPropagation();
       this.togglePip();
     });
+
+    const onPipClick = (e: Event) => {
+      if (e.target === toggleBtn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.callbacks.onRecenter) {
+        this.callbacks.onRecenter();
+      }
+    };
+    this.pipContainer.addEventListener('click', onPipClick);
+    this.pipContainer.addEventListener('touchend', onPipClick);
 
     this.pipCanvas = document.createElement('canvas');
     this.pipCanvas.className = 'ssr-pip-canvas';
@@ -578,6 +592,12 @@ export class PrivacyModalUI {
       ctx.font = 'bold 9px Arial, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(state.activeShape, w - 40, 18);
+
+      // Recenter tip
+      ctx.fillStyle = 'rgba(0, 230, 255, 0.75)';
+      ctx.font = 'bold 8px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TAP TO RECENTER', w / 2, h - 5);
 
       ctx.restore();
     }

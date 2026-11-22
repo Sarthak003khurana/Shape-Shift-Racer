@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/jsdom": "^30.0.0",
     "@types/node": "^22.10.1",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "jsdom": "^31.0.1",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2",

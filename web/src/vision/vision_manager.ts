@@ -131,7 +131,16 @@ export class VisionManager {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       console.warn('[VisionManager] mediaDevices.getUserMedia not supported on this platform');
       this.cameraStatus = 'unsupported';
-      this.privacyUI.showStatusBadge('Camera unsupported - Keyboard & Touch Active');
+      const isHttpOnRemote =
+        typeof window !== 'undefined' &&
+        !window.isSecureContext &&
+        window.location.protocol === 'http:' &&
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1';
+      const msg = isHttpOnRemote
+        ? 'HTTPS required for mobile camera (use https:// or deploy to Vercel)'
+        : 'Camera unsupported - Keyboard & Touch Active';
+      this.privacyUI.showStatusBadge(msg);
       return false;
     }
 
@@ -164,14 +173,19 @@ export class VisionManager {
       this.stream = stream;
       if (!this.video) {
         this.video = document.createElement('video');
-        this.video.setAttribute('playsinline', '');
-        this.video.setAttribute('autoplay', '');
+        this.video.setAttribute('playsinline', 'true');
+        this.video.setAttribute('webkit-playsinline', 'true');
+        (this.video as any).playsInline = true;
+        this.video.setAttribute('autoplay', 'true');
         this.video.muted = true;
-        // Keep hidden video mounted in DOM so Safari/Chrome always decode frames
-        this.video.style.position = 'absolute';
-        this.video.style.width = '1px';
-        this.video.style.height = '1px';
-        this.video.style.opacity = '0';
+        this.video.setAttribute('muted', 'true');
+        // iOS Safari requires non-zero size so hardware video decoder stays active
+        this.video.style.position = 'fixed';
+        this.video.style.top = '-9999px';
+        this.video.style.left = '-9999px';
+        this.video.style.width = `${idealWidth}px`;
+        this.video.style.height = `${idealHeight}px`;
+        this.video.style.opacity = '0.001';
         this.video.style.pointerEvents = 'none';
         if (this.container) {
           this.container.appendChild(this.video);
@@ -179,6 +193,14 @@ export class VisionManager {
       }
 
       this.video.srcObject = stream;
+      // Wait for metadata so videoWidth / videoHeight are non-zero before playback
+      await new Promise<void>((resolve) => {
+        if (this.video!.readyState >= HTMLMediaElement.HAVE_METADATA) {
+          resolve();
+        } else {
+          this.video!.onloadedmetadata = () => resolve();
+        }
+      });
       await this.video.play();
 
       this.cameraStatus = 'active';
@@ -191,7 +213,11 @@ export class VisionManager {
     } catch (err: any) {
       console.warn('[VisionManager] User denied camera or device unavailable:', err);
       this.cameraStatus = 'denied';
-      this.privacyUI.showStatusBadge('Camera Denied - Keyboard & Touch Active');
+      const msg =
+        err?.name === 'NotAllowedError'
+          ? 'Camera Permission Denied in Settings'
+          : 'Camera unavailable - Keyboard & Touch Active';
+      this.privacyUI.showStatusBadge(msg);
       return false;
     }
   }

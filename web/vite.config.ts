@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
+  plugins: [basicSsl()],
   // Configurable base path:
   // - Default './' produces relative asset URLs that work from domain root AND sub-paths.
   // - Set BASE_URL=/ for domain root or BASE_URL=/racer/ for a sub-path deployment.

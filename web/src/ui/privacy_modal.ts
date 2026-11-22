@@ -194,6 +194,33 @@ export class PrivacyModalUI {
         box-shadow: 0 0 16px rgba(0, 230, 255, 0.3);
       }
 
+      @media (max-width: 800px) and (orientation: portrait) {
+        .ssr-pip-hud {
+          top: calc(56px + env(safe-area-inset-top, 0px));
+          right: 12px;
+          width: 96px;
+          height: 72px;
+          border-width: 1.5px;
+        }
+
+        .ssr-modal-card {
+          padding: 20px 16px;
+        }
+
+        .ssr-modal-title {
+          font-size: 22px;
+        }
+
+        .ssr-features-list {
+          font-size: 11.5px;
+        }
+
+        .ssr-btn {
+          padding: 10px 18px;
+          font-size: 13.5px;
+        }
+      }
+
       .ssr-pip-canvas {
         width: 100%;
         height: 100%;

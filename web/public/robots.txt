@@ -10,4 +10,4 @@ Allow: /terms.html
 Allow: /credits.html
 
 # Production Sitemap URL
-Sitemap: https://sarthak.sbs/sitemap.xml
+Sitemap: https://racer.sarthak.sbs/sitemap.xml

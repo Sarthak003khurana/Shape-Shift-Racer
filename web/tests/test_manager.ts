@@ -93,12 +93,12 @@ if (typeof window === 'undefined' || !window.localStorage) {
     public length: number;
     public sampleRate: number;
     public data: Float32Array;
-    constructor(numberOfChannels: number, length: number, sampleRate: number) {
+    constructor(_numberOfChannels: number, length: number, sampleRate: number) {
       this.length = length;
       this.sampleRate = sampleRate;
       this.data = new Float32Array(length);
     }
-    public getChannelData(channel: number): Float32Array {
+    public getChannelData(_channel: number): Float32Array {
       return this.data;
     }
   }
@@ -106,19 +106,19 @@ if (typeof window === 'undefined' || !window.localStorage) {
   class MockGainNode {
     public gain = {
       value: 1.0,
-      setValueAtTime: (val: number, time: number) => {
+      setValueAtTime: (val: number, _time: number) => {
         this.gain.value = val;
       },
     };
-    public connect(dest: any) {}
+    public connect(_dest: any) {}
   }
 
   class MockAudioBufferSourceNode {
     public buffer: any = null;
     public loop: boolean = false;
     public onended: (() => void) | null = null;
-    public connect(dest: any) {}
-    public start(time: number) {}
+    public connect(_dest: any) {}
+    public start(_time?: number) {}
     public stop() {}
     public disconnect() {}
   }

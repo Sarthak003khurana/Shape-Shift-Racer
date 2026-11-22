@@ -4,7 +4,6 @@
  */
 
 import {
-  DEFAULT_SAMPLE_RATE,
   synthesizeMorph,
   synthesizeClear,
   synthesizeCoin,
@@ -24,11 +23,6 @@ function assert(condition: boolean, message: string): void {
   }
 }
 
-function assertInRange(val: number, min: number, max: number, name: string): void {
-  if (val < min || val > max) {
-    throw new Error(`Assertion failed: ${name} = ${val} not in [${min}, ${max}]`);
-  }
-}
 
 function checkBufferBounds(buf: Float32Array, name: string): { min: number; max: number; peak: number } {
   let min = Infinity;

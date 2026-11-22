@@ -34,7 +34,6 @@ function assert(condition: boolean, message: string): void {
 // Mock browser environment for node testing
 if (typeof window === 'undefined') {
   const store: Record<string, string> = {};
-  const mockDataLayer: unknown[] = [];
 
   (globalThis as any).window = {
     dataLayer: [],

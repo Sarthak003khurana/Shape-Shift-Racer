@@ -131,29 +131,29 @@ export class VisionManager {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       console.warn('[VisionManager] mediaDevices.getUserMedia not supported on this platform');
       this.cameraStatus = 'unsupported';
-      const isHttpOnRemote =
+      const isHttp =
         typeof window !== 'undefined' &&
-        !window.isSecureContext &&
         window.location.protocol === 'http:' &&
         window.location.hostname !== 'localhost' &&
         window.location.hostname !== '127.0.0.1';
-      const msg = isHttpOnRemote
-        ? 'HTTPS required for mobile camera (use https:// or deploy to Vercel)'
+      const msg = isHttp
+        ? 'HTTPS required for camera! Open https:// instead of http://'
         : 'Camera unsupported - Keyboard & Touch Active';
       this.privacyUI.showStatusBadge(msg);
+      if (typeof window !== 'undefined') {
+        alert(
+          isHttp
+            ? 'Camera access on mobile requires HTTPS.\n\nPlease open with https:// in your address bar (e.g. https://192.168.1.38:3000/) or deploy to Vercel!'
+            : 'Camera is not supported on this browser. Touch and keyboard controls are active!'
+        );
+      }
       return false;
     }
 
     try {
-      this.privacyUI.showStatusBadge('Initializing AI Vision Engine...');
-      const ready = await this.landmarkerService.init();
-      if (!ready) {
-        this.cameraStatus = 'unsupported';
-        this.privacyUI.showStatusBadge('Vision engine fallback - Keyboard & Touch Active');
-        return false;
-      }
+      this.privacyUI.showStatusBadge('Requesting camera permission...');
 
-      // Mobile Performance Tuning: Use 320x240 ideal constraints on mobile to minimize CPU/GPU load
+      // 1. MUST request getUserMedia IMMEDIATELY inside user gesture context!
       const isMobile =
         typeof navigator !== 'undefined' &&
         (/Android|iPhone|iPad|iPod|Windows Phone|webOS/i.test(navigator.userAgent || '') ||
@@ -161,16 +161,30 @@ export class VisionManager {
       const idealWidth = isMobile ? 320 : 480;
       const idealHeight = isMobile ? 240 : 360;
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: idealWidth },
-          height: { ideal: idealHeight },
-          facingMode: 'user',
-        },
-        audio: false,
-      });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: idealWidth },
+            height: { ideal: idealHeight },
+            facingMode: 'user',
+          },
+          audio: false,
+        });
+      } catch (constraintErr) {
+        console.warn(
+          '[VisionManager] Constrained getUserMedia failed, retrying with basic video constraint:',
+          constraintErr
+        );
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      }
 
       this.stream = stream;
+
+      // 2. Setup video element and start playback immediately in user gesture
       if (!this.video) {
         this.video = document.createElement('video');
         this.video.setAttribute('playsinline', 'true');
@@ -179,7 +193,6 @@ export class VisionManager {
         this.video.setAttribute('autoplay', 'true');
         this.video.muted = true;
         this.video.setAttribute('muted', 'true');
-        // iOS Safari requires non-zero size so hardware video decoder stays active
         this.video.style.position = 'fixed';
         this.video.style.top = '-9999px';
         this.video.style.left = '-9999px';
@@ -193,31 +206,45 @@ export class VisionManager {
       }
 
       this.video.srcObject = stream;
-      // Wait for metadata so videoWidth / videoHeight are non-zero before playback
-      await new Promise<void>((resolve) => {
-        if (this.video!.readyState >= HTMLMediaElement.HAVE_METADATA) {
-          resolve();
-        } else {
-          this.video!.onloadedmetadata = () => resolve();
-        }
-      });
-      await this.video.play();
+      try {
+        await this.video.play();
+      } catch (playErr) {
+        console.warn('[VisionManager] video.play() warning:', playErr);
+      }
 
+      // Mark camera as active and show PiP HUD immediately so user sees the camera is ON!
       this.cameraStatus = 'active';
       this.isRunning = true;
-      this.calibration.resetAutoZero();
       this.privacyUI.showPipHud();
-      this.privacyUI.showStatusBadge('Facial & Head Pose Tracking Active');
+      this.privacyUI.showStatusBadge('Camera active - loading AI models...');
+
+      // 3. Initialize MediaPipe Face Landmarker in background while camera stream is active
+      void this.landmarkerService.init().then((ready) => {
+        if (!ready) {
+          console.warn('[VisionManager] Face landmarker failed to init');
+          this.privacyUI.showStatusBadge('Camera on - Face AI fallback (Touch & Keys active)');
+        } else {
+          this.calibration.resetAutoZero();
+          this.privacyUI.showStatusBadge('Facial & Head Pose Tracking Active');
+        }
+      });
 
       return true;
     } catch (err: any) {
       console.warn('[VisionManager] User denied camera or device unavailable:', err);
       this.cameraStatus = 'denied';
-      const msg =
-        err?.name === 'NotAllowedError'
-          ? 'Camera Permission Denied in Settings'
-          : 'Camera unavailable - Keyboard & Touch Active';
+      const isDenied = err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError';
+      const msg = isDenied
+        ? 'Camera Permission Denied (Enable in browser settings)'
+        : `Camera error: ${err?.message || 'Device unavailable'}`;
       this.privacyUI.showStatusBadge(msg);
+      if (typeof window !== 'undefined') {
+        alert(
+          isDenied
+            ? 'Camera permission was denied.\n\nTo enable it:\n1. On iPhone, go to Settings > Safari > Camera and choose "Allow" (or tap the "aA" icon in the address bar > Website Settings > Camera > Allow).\n2. Then refresh the page!'
+            : `Camera error: ${err?.message || 'Unable to start camera'}`
+        );
+      }
       return false;
     }
   }

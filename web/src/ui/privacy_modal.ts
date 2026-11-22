@@ -160,22 +160,24 @@ export class PrivacyModalUI {
         color: #00e6ff;
       }
 
-      /* Fallback status badge (centered at bottom, clear of left/right touch pads) */
+      /* Fallback status badge (prominent top center notification) */
       .ssr-status-badge {
         position: absolute;
-        bottom: 16px;
+        top: 14px;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(18, 14, 34, 0.88);
-        border: 1px solid rgba(0, 230, 255, 0.45);
+        background: rgba(18, 14, 34, 0.92);
+        border: 1px solid rgba(0, 230, 255, 0.6);
         border-radius: 999px;
-        padding: 5px 14px;
-        font-size: 12px;
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: bold;
         color: #00e6ff;
         white-space: nowrap;
         display: none;
         pointer-events: none;
-        z-index: 50;
+        z-index: 999;
+        box-shadow: 0 0 15px rgba(0, 230, 255, 0.4);
       }
 
       /* PiP Webcam Preview HUD */
@@ -337,16 +339,32 @@ export class PrivacyModalUI {
     const btnEnable = this.modalElement.querySelector('#ssr-btn-enable-cam');
     const btnSkip = this.modalElement.querySelector('#ssr-btn-skip-cam');
 
-    btnEnable?.addEventListener('click', () => {
+    let enableHandled = false;
+    const onEnable = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (enableHandled) return;
+      enableHandled = true;
       this.hideModal();
       this.callbacks.onEnableCamera();
-    });
+    };
 
-    btnSkip?.addEventListener('click', () => {
+    btnEnable?.addEventListener('click', onEnable);
+    btnEnable?.addEventListener('touchend', onEnable);
+
+    let skipHandled = false;
+    const onSkip = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (skipHandled) return;
+      skipHandled = true;
       this.hideModal();
       this.callbacks.onSkipCamera();
       this.showStatusBadge('Keyboard & Touch Controls Active');
-    });
+    };
+
+    btnSkip?.addEventListener('click', onSkip);
+    btnSkip?.addEventListener('touchend', onSkip);
   }
 
   private createStatusBadge(): void {

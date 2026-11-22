@@ -217,7 +217,7 @@ const envMeta =
 
 export const ADS_ENABLED: boolean = envMeta.VITE_ADS_ENABLED === 'true';
 export const SHOW_ADS: boolean = envMeta.VITE_SHOW_ADS === 'true';
-export const ADSENSE_CLIENT_ID: string = envMeta.VITE_ADSENSE_CLIENT_ID || '';
+export const ADSENSE_CLIENT_ID: string = envMeta.VITE_ADSENSE_CLIENT_ID || 'ca-pub-4627783195003112';
 export const CONSENT_STORAGE_KEY = 'ssr_cookie_consent_v1';
 export const ADSENSE_TEST_MODE: boolean = envMeta.VITE_ADSENSE_TEST_MODE === 'true';
 

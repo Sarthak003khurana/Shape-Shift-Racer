@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Shape-Shift Racer by Sarthak</title>
+    <meta name="description" content="Shape-Shift Racer: A fast-paced 2.5D synthwave arcade racer where you morph your car in real-time to pass obstacles! Features on-device AI facial controls." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0a0512" />
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: #08040f;
+        color: #e0d8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      #game-wrapper {
+        width: 100%;
+        max-width: 1280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        margin: 0 auto;
+      }
+
+      #game-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        max-height: 100vh;
+        background: #000;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 10px 40px rgba(0, 230, 255, 0.15);
+        contain: content;
+      }
+
+      #game-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        touch-action: none;
+        contain: strict;
+      }
+
+      /* Mobile Touch HUD Overlay */
+      #touch-controls {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 16px 20px;
+        touch-action: none;
+      }
+
+      .touch-group {
+        display: flex;
+        gap: 12px;
+        pointer-events: auto;
+      }
+
+      .touch-btn {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 230, 255, 0.6);
+        background: rgba(18, 14, 34, 0.75);
+        color: #00e6ff;
+        font-size: 20px;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        touch-action: none;
+        transition: transform 0.08s, background-color 0.08s, border-color 0.08s;
+        box-shadow: 0 0 12px rgba(0, 230, 255, 0.3);
+      }
+
+      .touch-btn:active, .touch-btn.active {
+        transform: scale(0.92);
+        background: rgba(0, 230, 255, 0.35);
+        border-color: #00e6ff;
+      }
+
+      .touch-btn span.label {
+        font-size: 9px;
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .touch-btn.btn-flat {
+        border-color: rgba(255, 0, 128, 0.7);
+        color: #ff0080;
+        box-shadow: 0 0 12px rgba(255, 0, 128, 0.3);
+      }
+      .touch-btn.btn-flat:active, .touch-btn.btn-flat.active {
+        background: rgba(255, 0, 128, 0.35);
+        border-color: #ff0080;
+      }
+
+      .touch-btn.btn-narrow {
+        border-color: rgba(0, 255, 140, 0.7);
+        color: #00ff8c;
+        box-shadow: 0 0 12px rgba(0, 255, 140, 0.3);
+      }
+      .touch-btn.btn-narrow:active, .touch-btn.btn-narrow.active {
+        background: rgba(0, 255, 140, 0.35);
+        border-color: #00ff8c;
+      }
+
+      .touch-btn.btn-audio {
+        position: absolute;
+        top: 14px;
+        right: 68px;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+        border-color: rgba(0, 230, 255, 0.6);
+        color: #00e6ff;
+      }
+
+      .touch-btn.btn-audio.muted {
+        border-color: rgba(255, 80, 80, 0.6);
+        color: #ff5050;
+      }
+
+      .touch-btn.btn-pause {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+        border-color: rgba(255, 230, 0, 0.6);
+        color: #ffe600;
+      }
+
+      /* In-Game Overlay Ad Containers (Strictly hidden when SHOW_ADS=false) */
+      .ssr-ad-slot:not(.ssr-ad-active),
+      .ssr-ad-slot[hidden],
+      .ssr-ad-slot[data-ads-disabled="true"] {
+        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        max-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+
+      /* Editorial Content Below Canvas */
+      #editorial-content {
+        width: 100%;
+        max-width: 960px;
+        padding: 44px 24px;
+        line-height: 1.7;
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
+      #editorial-content h1 {
+        font-size: 2.3rem;
+        color: #00e6ff;
+        margin-bottom: 12px;
+        text-shadow: 0 0 15px rgba(0, 230, 255, 0.4);
+      }
+
+      #editorial-content h2 {
+        font-size: 1.55rem;
+        color: #ff0080;
+        margin: 36px 0 14px;
+        border-bottom: 1px solid rgba(255, 0, 128, 0.25);
+        padding-bottom: 6px;
+      }
+
+      #editorial-content h3 {
+        font-size: 1.2rem;
+        color: #00e6ff;
+        margin: 22px 0 8px;
+      }
+
+      #editorial-content p {
+        margin-bottom: 16px;
+        color: #cfc7e0;
+      }
+
+      #editorial-content ul, #editorial-content ol {
+        margin: 0 0 18px 24px;
+        color: #cfc7e0;
+      }
+
+      #editorial-content li {
+        margin-bottom: 8px;
+      }
+
+      .privacy-callout {
+        background: rgba(0, 255, 140, 0.08);
+        border: 1px solid rgba(0, 255, 140, 0.35);
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin: 24px 0;
+        color: #dffae9;
+      }
+
+      .privacy-callout strong {
+        color: #00ff8c;
+      }
+
+      .controls-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 22px 0;
+        background: rgba(20, 16, 38, 0.7);
+        border: 1px solid rgba(0, 230, 255, 0.25);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .controls-table th, .controls-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .controls-table th {
+        background: rgba(0, 230, 255, 0.12);
+        color: #00e6ff;
+        font-weight: 700;
+      }
+
+      .biome-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
+        margin: 20px 0;
+      }
+
+      .biome-card {
+        background: rgba(18, 14, 34, 0.8);
+        border: 1px solid rgba(0, 230, 255, 0.2);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .biome-card h4 {
+        color: #ffe600;
+        margin-bottom: 6px;
+        font-size: 1.05rem;
+      }
+
+      .biome-card p {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+      }
+
+      .faq-card {
+        background: rgba(18, 14, 34, 0.8);
+        border: 1px solid rgba(255, 0, 128, 0.25);
+        border-radius: 8px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+      }
+
+      .faq-card h3 {
+        margin-top: 0;
+        color: #00e6ff;
+        font-size: 1.15rem;
+      }
+
+      .faq-card p {
+        margin-bottom: 0;
+      }
+
+      footer {
+        width: 100%;
+        padding: 28px 24px;
+        text-align: center;
+        color: #7d7395;
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(10, 6, 20, 0.95);
+      }
+
+      .footer-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+        margin-bottom: 12px;
+      }
+
+      footer a,
+      .footer-link-btn {
+        color: #00e6ff;
+        text-decoration: none;
+        background: none;
+        border: none;
+        font: inherit;
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s;
+      }
+
+      footer a:hover,
+      .footer-link-btn:hover {
+        text-decoration: underline;
+        color: #64ff8c;
+      }
+
+      @media (max-width: 640px) {
+        .touch-btn {
+          width: 52px;
+          height: 52px;
+          font-size: 16px;
+        }
+        .controls-table th, .controls-table td {
+          padding: 8px 10px;
+          font-size: 0.85rem;
+        }
+        #editorial-content {
+          padding: 24px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-wrapper">
+      <div id="game-container">
+        <canvas id="game-canvas" width="1280" height="720"></canvas>
+        <div id="touch-controls">
+          <div class="touch-group left-group">
+            <button id="btn-steer-left" class="touch-btn" aria-label="Steer Left">
+              ◀<span class="label">Left</span>
+            </button>
+            <button id="btn-steer-right" class="touch-btn" aria-label="Steer Right">
+              ▶<span class="label">Right</span>
+            </button>
+          </div>
+          <button id="btn-audio" class="touch-btn btn-audio" aria-label="Toggle Audio">
+            🔊
+          </button>
+          <button id="btn-pause" class="touch-btn btn-pause" aria-label="Pause">
+            ⏸
+          </button>
+          <div class="touch-group right-group">
+            <button id="btn-shape-flat" class="touch-btn btn-flat" aria-label="Morph Flat">
+              ▬<span class="label">Flat</span>
+            </button>
+            <button id="btn-shape-normal" class="touch-btn btn-normal" aria-label="Morph Normal">
+              ◆<span class="label">Normal</span>
+            </button>
+            <button id="btn-shape-narrow" class="touch-btn btn-narrow" aria-label="Morph Narrow">
+              ▮<span class="label">Slim</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- In-game Ad Slot Containers (Feature-flagged, strictly hidden when SHOW_ADS=false) -->
+        <div id="ssr-ad-slot-menu" class="ssr-ad-slot" hidden aria-hidden="true"></div>
+        <div id="ssr-ad-slot-gameover" class="ssr-ad-slot" hidden aria-hidden="true"></div>
+      </div>
+
+      <!-- Feature-flagged Below-Game Ad Container -->
+      <div id="ssr-ad-slot-below-game" class="ssr-ad-slot" hidden aria-hidden="true"></div>
+
+      <main id="editorial-content">
+        <header>
+          <h1>Shape-Shift Racer by Sarthak</h1>
+          <p>
+            Welcome to <strong>Shape-Shift Racer by Sarthak</strong>, a high-octane 2.5D retro synthwave arcade racer engineered with pure mathematical perspective projection, real-time vehicle morphing mechanics, procedural Web Audio synthesis, and cutting-edge on-device facial expression artificial intelligence. Race across endlessly curving neon highways, morph between vehicle forms at blazing speeds, dodge laser low beams and narrow pillar gates, collect energy coins, and build massive multiplier streaks!
+          </p>
+        </header>
+
+        <section class="privacy-callout">
+          <strong>100% On-Device Facial AI &amp; Privacy Guarantee:</strong> Enabling your webcam is completely optional. When activated, all facial landmark, blendshape expression, and head-pose inference runs strictly on-device in WebAssembly client-side memory. Video frames never leave your computer or smartphone, are never recorded to disk, and are never transmitted to any external server. You can play the full game using desktop keyboard or mobile touch controls without ever turning on the camera.
+        </section>
+
+        <section id="how-to-play">
+          <h2>How to Play &amp; Game Objectives</h2>
+          <p>
+            Your objective in Shape-Shift Racer is simple yet intensely demanding: navigate a continuous 3-lane neon superhighway, survive increasingly treacherous gauntlets of obstacles, and push your score and distance as far into the synthwave sunset as your reflexes allow.
+          </p>
+          <p>
+            As you race forward, the game engine continuously accelerates your vehicle from an initial cruising speed of <strong>420 km/h</strong> up to a blistering maximum of <strong>920 km/h</strong>. Each 500 meters traveled dynamically shifts your racing environment into a new visual biome with unique color palettes, mountain horizons, and retro sunsets:
+          </p>
+
+          <div class="biome-grid">
+            <div class="biome-card">
+              <h4>1. Sunset Drive (0&ndash;500m)</h4>
+              <p>Warm golden solar disc, deep violet skies, magenta curb accents, and dark asphalt reflecting the evening glow.</p>
+            </div>
+            <div class="biome-card">
+              <h4>2. Cyber Night (500&ndash;1000m)</h4>
+              <p>Electric cyan sun, deep cobalt starfield, pulsing turquoise curbstones, and high-contrast night highway visibility.</p>
+            </div>
+            <div class="biome-card">
+              <h4>3. Neon Tokyo (1000&ndash;1500m)</h4>
+              <p>Emerald green horizon, hot pink mountain skylines, lime curb lighting, and intense futuristic urban energy.</p>
+            </div>
+            <div class="biome-card">
+              <h4>4. Plasma Storm (1500&ndash;2000m+)</h4>
+              <p>Blazing crimson skies, molten amber solar flare, yellow-orange curb markers, and top-tier highway velocity.</p>
+            </div>
+          </div>
+          <p>
+            Surviving each biome requires quick reaction times, anticipation of upcoming track curvature, and seamless mastery of your vehicle's three transformational morphing configurations.
+          </p>
+        </section>
+
+        <section id="morphing-mastery">
+          <h2>Morphing Mastery &amp; Obstacle Clearance</h2>
+          <p>
+            Traditional racing games confine you to a static vehicle body. In <em>Shape-Shift Racer</em>, your car is an advanced modular cyber-craft capable of instantaneous geometric metamorphosis. Obstacles spawned along the highway specifically test either your lateral lane steering or your vehicle cross-section clearance:
+          </p>
+
+          <table class="controls-table">
+            <thead>
+              <tr>
+                <th>Vehicle Mode</th>
+                <th>Dimensions</th>
+                <th>Facial Gesture</th>
+                <th>Keyboard Key</th>
+                <th>Target Clearance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>CRUISER (Normal)</strong></td>
+                <td>84 &times; 50 px</td>
+                <td>Relaxed / Neutral Face</td>
+                <td>Space</td>
+                <td>Standard cruising; evades single &amp; double-lane RoadBlocks.</td>
+              </tr>
+              <tr>
+                <td><strong>LOW-RIDER (Flat)</strong></td>
+                <td>136 &times; 22 px</td>
+                <td>Smile Wide</td>
+                <td>Down Arrow / S</td>
+                <td>Slides underneath overhead LowBeams (30 px clearance gap).</td>
+              </tr>
+              <tr>
+                <td><strong>SLIM-BLADE (Narrow)</strong></td>
+                <td>32 &times; 100 px</td>
+                <td>Open Mouth (O-Shape)</td>
+                <td>Up Arrow / W</td>
+                <td>Squeezes through twin PillarGates (48 px gap width).</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Understanding Clearance Physics</h3>
+          <p>
+            The collision detection engine computes real-time bounding box intersections at your vehicle's longitudinal depth (<span class="code-pill">CAR_Z = 40.0</span>):
+          </p>
+          <ul>
+            <li>
+              <strong>LowBeam Barriers:</strong> Spanned horizontally across all three lanes with an open clearance height of exactly 30 pixels. When driving the <em>CRUISER</em> (height 50 px) or <em>SLIM-BLADE</em> (height 100 px), you will suffer an immediate collision. Morphing into the ultra-flat <em>LOW-RIDER</em> (height 22 px) grants 8 pixels of safe clearance, letting you glide underneath unharmed.
+            </li>
+            <li>
+              <strong>PillarGate Barriers:</strong> Heavy vertical twin concrete pillars with a centered or lane-shifted opening of exactly 48 pixels. Neither the wide <em>CRUISER</em> (width 84 px) nor the extra-wide <em>LOW-RIDER</em> (width 136 px) can pass without colliding. Only the aerodynamic <em>SLIM-BLADE</em> (width 32 px) can thread this needle, leaving 16 pixels of lateral tolerance.
+            </li>
+            <li>
+              <strong>RoadBlock Barricades:</strong> Impassable single or double-lane barricades placed at road level. No shape can drive through a RoadBlock; you must steer laterally into an unoccupied adjacent lane.
+            </li>
+            <li>
+              <strong>Gauntlet Waves:</strong> High-speed sequences where LowBeams, PillarGates, and RoadBlocks are spawned back-to-back, demanding instantaneous combinations of steering shifts and vehicle transformations in under a fraction of a second.
+            </li>
+          </ul>
+        </section>
+
+        <!-- Feature-flagged Mid-Editorial Ad Container -->
+        <div id="ssr-ad-slot-editorial-mid" class="ssr-ad-slot" hidden aria-hidden="true"></div>
+
+        <section id="controls-guide">
+          <h2>Dual Control Guide: Vision, Keyboard &amp; Touch</h2>
+          <p>
+            Shape-Shift Racer is built to be playable on any modern device, providing three fully featured and seamlessly unified input modalities:
+          </p>
+
+          <h3>1. On-Device Vision &amp; Facial Expression AI</h3>
+          <p>
+            By toggling the camera on, you can pilot your vehicle using natural head gestures and facial expressions:
+          </p>
+          <ul>
+            <li><strong>Steering (Head Pose Yaw / Roll):</strong> Gently turn your head to the left or tilt your chin left to glide into the left lane. Turn or tilt right to steer right. Keep your head facing forward to center your car in the middle lane. A built-in 0.18 deadzone prevents accidental drifting.</li>
+            <li><strong>Flat Morph (Smile Expression):</strong> Smile broadly to trigger the <em>LOW-RIDER</em> shape. The vision pipeline monitors lip corner elevation and mouth stretch blendshapes to detect smiles reliably.</li>
+            <li><strong>Narrow Morph (Open Mouth Expression):</strong> Open your mouth or drop your jaw into an "O" shape to activate the <em>SLIM-BLADE</em> morph.</li>
+            <li><strong>Normal Cruiser (Relaxed Face):</strong> Return your facial muscles to a relaxed resting expression to morph back into the standard <em>CRUISER</em>.</li>
+          </ul>
+
+          <h3>2. Desktop Keyboard Controls</h3>
+          <p>
+            For traditional arcade precision or low-light gaming environments:
+          </p>
+          <ul>
+            <li><strong>Steering:</strong> <strong>A / D</strong> or <strong>Left / Right Arrow Keys</strong> to shift lanes.</li>
+            <li><strong>Morph Flat:</strong> <strong>S</strong> or <strong>Down Arrow Key</strong>.</li>
+            <li><strong>Morph Narrow:</strong> <strong>W</strong> or <strong>Up Arrow Key</strong>.</li>
+            <li><strong>Morph Normal:</strong> <strong>Spacebar</strong> (also starts the game and restarts after Game Over).</li>
+            <li><strong>Pause &amp; Settings:</strong> <strong>P</strong> or <strong>Escape</strong> to open the Pause menu.</li>
+            <li><strong>Audio Toggle:</strong> <strong>M</strong> key to mute or unmute procedural music and sound effects.</li>
+          </ul>
+
+          <h3>3. Mobile Multi-Touch HUD</h3>
+          <p>
+            When playing on mobile phones or tablets, an ergonomic on-screen touch HUD appears automatically:
+          </p>
+          <ul>
+            <li><strong>Left Thumb Cluster:</strong> Tactile left and right steering arrow pads for rapid thumb lane snapping.</li>
+            <li><strong>Right Thumb Cluster:</strong> Color-coded shape morph buttons: Hot Pink (Flat), Cyan (Normal), and Lime Green (Slim).</li>
+            <li><strong>Top Right Utility Buttons:</strong> Quick-access Audio mute and Pause buttons.</li>
+            <li><strong>Input Priority Guarantee:</strong> Keyboard and touch inputs always take instantaneous priority over webcam vision tracking, ensuring you always have full tactile override capability.</li>
+          </ul>
+        </section>
+
+        <section id="facial-ai-technology">
+          <h2>On-Device Facial AI Technology &amp; Signal Processing</h2>
+          <p>
+            The vision subsystem inside Shape-Shift Racer represents a significant technical accomplishment in browser-based machine perception. Unlike cloud-dependent AI applications that transmit your video to remote servers for processing, Shape-Shift Racer runs 100% locally on your CPU/GPU hardware using Google MediaPipe Tasks Vision compiled to WebAssembly.
+          </p>
+          <p>
+            To achieve responsive, esports-grade responsiveness without sacrificing frame rates or overheating mobile devices, the system incorporates four key algorithmic layers:
+          </p>
+          <ol>
+            <li>
+              <strong>Decoupled Thread Execution:</strong> The 2.5D pseudo-3D rendering loop operates at a silky smooth 60 frames per second using <span class="code-pill">requestAnimationFrame</span>. Vision landmark extraction runs on an independent async schedule throttled to 20&ndash;30 Hz. This decouples CPU-intensive neural network inference from rendering, guaranteeing zero dropped frames during gameplay.
+            </li>
+            <li>
+              <strong>One-Euro Adaptive Filtering:</strong> Raw facial blendshapes and head pose angles from webcam feeds naturally contain high-frequency sensor noise. Shape-Shift Racer processes all continuous control signals through adaptive One-Euro filters (<span class="code-pill">f_c = f_{c,min} + beta * |dx/dt|</span>). At rest, the cutoff frequency drops to eliminate jitter; during rapid head movements, the cutoff frequency expands to eliminate lag.
+            </li>
+            <li>
+              <strong>Expression Hysteresis &amp; Cross-Suppression:</strong> To eliminate jittery rapid flipping between shapes at threshold boundaries, the state machine implements asymmetric Schmitt-trigger hysteresis. A gesture must exceed an activation threshold of <strong>0.42</strong> to trigger a morph, and must fall below <strong>0.28</strong> to release. Furthermore, a <strong>0.12</strong> mutual margin and cross-suppression prevent conflicting smile and open-mouth signals from firing simultaneously.
+            </li>
+            <li>
+              <strong>Fast Auto-Zero &amp; 3-Step Interactive Calibration:</strong> Every human face possesses unique resting geometry. Upon starting the camera, an automated 1-step calibration measures your neutral baseline over the first 10 frames. In addition, players can pause at any time to run an optional 3-step interactive calibration wizard (Neutral &rarr; Full Smile &rarr; Wide Open Mouth) or manually adjust individual sensitivity sliders.
+            </li>
+          </ol>
+        </section>
+
+        <section id="faq-troubleshooting">
+          <h2>Gestures FAQ &amp; Troubleshooting</h2>
+          <div class="faq-card">
+            <h3>How should I set up my lighting for best tracking?</h3>
+            <p>
+              Ensure your face is evenly illuminated from the front or slightly above. Avoid strong backlights, such as sitting with an unshaded window or bright lamp directly behind your head, which casts your face in deep shadow and makes landmark detection difficult.
+            </p>
+          </div>
+          <div class="faq-card">
+            <h3>Can I play while wearing eyeglasses?</h3>
+            <p>
+              Yes! MediaPipe Face Landmarker tracks facial musculature around the mouth and cheeks, as well as 3D head orientation. If your lenses produce heavy glare or reflections that obscure your eyes, slightly tilt your monitor or adjust your room lighting to minimize lens glare.
+            </p>
+          </div>
+          <div class="faq-card">
+            <h3>What is the ideal distance from the camera?</h3>
+            <p>
+              Position yourself approximately 40 to 70 centimeters (arm's length) from your webcam or laptop screen. Frame your face comfortably within the upper-middle region of the optional picture-in-picture preview box.
+            </p>
+          </div>
+          <div class="faq-card">
+            <h3>What happens if I deny camera permissions?</h3>
+            <p>
+              The game immediately and gracefully falls back to keyboard and touch mode with zero penalty or restriction. You can play every track, biome, and mode without a camera. You can also re-enable the camera anytime via your browser's address bar permissions icon.
+            </p>
+          </div>
+        </section>
+
+        <section id="scoring-strategy">
+          <h2>Scoring Strategy, Multipliers &amp; Leaderboards</h2>
+          <p>
+            Climbing the local Top-5 high score leaderboard requires balancing pure survival with calculated risk-taking:
+          </p>
+          <ul>
+            <li><strong>Base Obstacle Clear:</strong> 100 points for every LowBeam, PillarGate, or RoadBlock cleanly bypassed.</li>
+            <li><strong>Energy Coins:</strong> 50 points for each spinning golden coin collected. Coins are strategically positioned inside optimal morph clearance gaps, rewarding players who line up perfect lines.</li>
+            <li><strong>Near-Miss Bonus:</strong> 50 bonus points awarded whenever you thread a PillarGate or LowBeam within close lateral or vertical clearance margins without taking damage.</li>
+            <li>
+              <strong>Streak Multipliers:</strong> Consecutive clean obstacle clears build your active streak:
+              <ul>
+                <li>Streak 0&ndash;2: <strong>1x</strong> multiplier</li>
+                <li>Streak 3&ndash;5: <strong>2x</strong> multiplier</li>
+                <li>Streak 6&ndash;9: <strong>3x</strong> multiplier</li>
+                <li>Streak 10+: <strong>5x</strong> maximum multiplier!</li>
+              </ul>
+            </li>
+            <li><strong>Lives &amp; Recovery:</strong> You start with 3 lives represented by neon hearts in the telemetry HUD. Taking a hit triggers screen shake, a crimson visual flash, resets your streak multiplier back to 1x, and provides 1.5 seconds of damage invulnerability to recover your line.</li>
+            <li><strong>Persistent Top-5 Leaderboard:</strong> Your top five high scores, distances traveled, coin totals, max streaks, and run dates are preserved safely inside browser <span class="code-pill">localStorage</span> so your personal records are ready to challenge on your next visit.</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer>
+        <nav class="footer-nav" aria-label="Footer Navigation">
+          <a href="./index.html">Play Game</a>
+          <a href="./about.html">About</a>
+          <a href="./privacy.html">Privacy Policy</a>
+          <a href="./terms.html">Terms of Use</a>
+          <a href="./credits.html">Credits &amp; Licenses</a>
+          <a href="./contact.html">Contact</a>
+          <button id="btn-cookie-settings" class="footer-link-btn" type="button">Cookie Settings</button>
+        </nav>
+        <p>
+          &copy; 2026 Shape-Shift Racer by Sarthak. Built with Vite, TypeScript, Canvas 2D &amp; self-hosted MediaPipe Tasks Vision (Apache 2.0).
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

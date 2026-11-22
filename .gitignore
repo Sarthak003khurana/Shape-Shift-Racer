@@ -24,3 +24,13 @@ settings.json
 Thumbs.db
 *.swp
 *~
+
+# Antigravity agent scratch/handoffs
+.agents/
+
+# Web dependencies and build outputs
+web/node_modules/
+web/dist/
+web/.env.local
+web/.env.*.local
+.vite/

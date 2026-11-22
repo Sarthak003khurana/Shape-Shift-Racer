@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Production builds
+dist/
+
+# Local environment overrides
+.env.local
+.env.*.local
+
+# Caches
+.vite/

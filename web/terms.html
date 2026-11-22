@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms of Use — Shape-Shift Racer by Sarthak</title>
+    <meta name="description" content="Terms of Use for Shape-Shift Racer by Sarthak." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0a0512" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background-color: #08040f;
+        color: #e0d8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.7;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        background: rgba(18, 14, 34, 0.92);
+        border-bottom: 1px solid rgba(0, 230, 255, 0.25);
+        padding: 16px 24px;
+      }
+      .header-inner {
+        max-width: 860px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .brand { font-size: 1.15rem; font-weight: 800; color: #00e6ff; text-decoration: none; }
+      .back-link { color: #64ff8c; text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+      .back-link:hover { text-decoration: underline; }
+      main { flex: 1; width: 100%; max-width: 860px; margin: 0 auto; padding: 36px 24px 48px; }
+      h1 { font-size: 2rem; color: #00e6ff; margin-bottom: 8px; }
+      .meta { font-size: 0.9rem; color: #9ba5be; margin-bottom: 26px; }
+      h2 { font-size: 1.35rem; color: #ff0080; margin: 28px 0 10px; }
+      p { margin-bottom: 14px; color: #cfc7e0; }
+      a { color: #00e6ff; }
+      footer {
+        padding: 24px 20px;
+        text-align: center;
+        color: #8c82a6;
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .footer-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 10px; }
+      .footer-link-btn { color: #00e6ff; background: none; border: none; font: inherit; cursor: pointer; padding: 0; }
+      .footer-link-btn:hover, footer a:hover { text-decoration: underline; }
+      footer a { color: #00e6ff; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <a class="brand" href="./index.html">Shape-Shift Racer by Sarthak</a>
+        <a class="back-link" href="./index.html">&larr; Back to Game</a>
+      </div>
+    </header>
+
+    <main>
+      <h1>Terms of Use</h1>
+      <p class="meta">Last updated: 2026 &bull; Shape-Shift Racer by Sarthak</p>
+
+      <h2>1. Acceptance of Terms</h2>
+      <p>
+        By accessing or playing <strong>Shape-Shift Racer by Sarthak</strong>, you agree to these Terms of Use. If you do not agree, please discontinue use of the site.
+      </p>
+
+      <h2>2. Permitted Use</h2>
+      <p>
+        This browser game is provided free for personal, non-commercial entertainment. You agree not to interfere with the site's operation, attempt unauthorized access to hosting infrastructure, or abuse automated traffic against the site.
+      </p>
+
+      <h2>3. Health, Comfort &amp; Camera Use</h2>
+      <p>
+        Optional facial and head-pose controls involve gentle head turns and facial expressions. Please play in a well-lit environment, take regular breaks, and stop immediately if you experience eye strain, neck discomfort, or sensitivity to flashing arcade visuals. Keyboard and touch controls are always available as an alternative.
+      </p>
+
+      <h2>4. Intellectual Property &amp; Open-Source Licenses</h2>
+      <p>
+        Original game design, code, procedural audio synthesis, and artwork for Shape-Shift Racer by Sarthak remain the property of their author. Open-source third-party components, including Google MediaPipe Tasks Vision and <code>face_landmarker.task</code>, are licensed under their respective licenses as documented on the <a href="./credits.html">Credits &amp; Licenses</a> page.
+      </p>
+
+      <h2>5. Disclaimer of Warranties</h2>
+      <p>
+        The game is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind, whether express or implied, including uninterrupted availability or compatibility with every browser or webcam device.
+      </p>
+
+      <h2>6. Contact</h2>
+      <p>
+        Questions regarding these Terms of Use may be directed to <strong><a href="mailto:shapeshifttracer@gmail.com" style="color: #00e6ff;">shapeshifttracer@gmail.com</a></strong>.
+      </p>
+    </main>
+
+    <footer>
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <a href="./index.html">Play Game</a>
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Use</a>
+        <a href="./credits.html">Credits &amp; Licenses</a>
+        <a href="./contact.html">Contact</a>
+        <button id="btn-cookie-settings" class="footer-link-btn" type="button">Cookie Preferences</button>
+      </nav>
+      <p>&copy; 2026 Shape-Shift Racer by Sarthak.</p>
+    </footer>
+
+    <script type="module" src="./src/pages.ts"></script>
+  </body>
+</html>

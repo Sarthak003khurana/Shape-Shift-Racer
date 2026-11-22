@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact — Shape-Shift Racer by Sarthak</title>
+    <meta name="description" content="Contact Sarthak for questions, bug reports, feedback, or privacy inquiries regarding Shape-Shift Racer." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0a0512" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background-color: #08040f;
+        color: #e0d8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.7;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        background: rgba(18, 14, 34, 0.92);
+        border-bottom: 1px solid rgba(0, 230, 255, 0.25);
+        padding: 16px 24px;
+      }
+      .header-inner {
+        max-width: 860px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .brand { font-size: 1.15rem; font-weight: 800; color: #00e6ff; text-decoration: none; }
+      .back-link { color: #64ff8c; text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+      .back-link:hover { text-decoration: underline; }
+      main { flex: 1; width: 100%; max-width: 860px; margin: 0 auto; padding: 36px 24px 48px; }
+      h1 { font-size: 2rem; color: #00e6ff; margin-bottom: 8px; }
+      .meta { font-size: 0.9rem; color: #9ba5be; margin-bottom: 26px; }
+      h2 { font-size: 1.35rem; color: #ff0080; margin: 28px 0 10px; }
+      p { margin-bottom: 14px; color: #cfc7e0; }
+      ul { margin: 0 0 16px 22px; color: #cfc7e0; }
+      li { margin-bottom: 8px; }
+      a { color: #00e6ff; }
+      .contact-card {
+        background: rgba(20, 16, 38, 0.85);
+        border: 1px solid rgba(0, 230, 255, 0.35);
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin: 20px 0;
+      }
+      .email-pill {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        background: rgba(0, 230, 255, 0.14);
+        border: 1px solid #00e6ff;
+        color: #00e6ff;
+        font-weight: 700;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+      footer {
+        padding: 24px 20px;
+        text-align: center;
+        color: #8c82a6;
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .footer-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 10px; }
+      .footer-link-btn { color: #00e6ff; background: none; border: none; font: inherit; cursor: pointer; padding: 0; }
+      .footer-link-btn:hover, footer a:hover { text-decoration: underline; }
+      footer a { color: #00e6ff; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <a class="brand" href="./index.html">Shape-Shift Racer by Sarthak</a>
+        <a class="back-link" href="./index.html">&larr; Back to Game</a>
+      </div>
+    </header>
+
+    <main>
+      <h1>Contact</h1>
+      <p class="meta">Shape-Shift Racer by Sarthak</p>
+
+      <p>
+        Have feedback, found a bug, or have a privacy/licensing inquiry about <strong>Shape-Shift Racer by Sarthak</strong>? Reach out directly by email:
+      </p>
+
+      <div class="contact-card">
+        <div><strong>Direct Contact Email:</strong></div>
+        <div class="email-pill"><a href="mailto:shapeshifttracer@gmail.com" style="color: inherit; text-decoration: none;">shapeshifttracer@gmail.com</a></div>
+      </div>
+
+      <h2>When Reporting a Bug</h2>
+      <p>To help reproduce and fix issues faster, please include:</p>
+      <ul>
+        <li>Your browser and operating system (e.g., Chrome on Windows, Safari on iOS).</li>
+        <li>Whether you were using Keyboard, Touch, or optional Webcam Facial Controls.</li>
+        <li>A brief description of what happened and any console error messages if available.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <a href="./index.html">Play Game</a>
+        <a href="./about.html">About</a>
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Use</a>
+        <a href="./credits.html">Credits &amp; Licenses</a>
+        <a href="./contact.html">Contact</a>
+        <button id="btn-cookie-settings" class="footer-link-btn" type="button">Cookie Preferences</button>
+      </nav>
+      <p>&copy; 2026 Shape-Shift Racer by Sarthak.</p>
+    </footer>
+
+    <script type="module" src="./src/pages.ts"></script>
+  </body>
+</html>

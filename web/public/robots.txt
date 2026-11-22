@@ -1,0 +1,13 @@
+# Shape-Shift Racer by Sarthak
+# Robots.txt crawler configuration
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /about.html
+Allow: /privacy.html
+Allow: /contact.html
+Allow: /terms.html
+Allow: /credits.html
+
+# Production Sitemap URL
+Sitemap: https://sarthak.sbs/sitemap.xml

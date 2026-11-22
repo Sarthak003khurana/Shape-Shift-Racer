@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy — Shape-Shift Racer by Sarthak</title>
+    <meta name="description" content="Privacy Policy for Shape-Shift Racer by Sarthak: 100% on-device camera processing, local storage details, and EEA/UK cookie consent policy." />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0a0512" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background-color: #08040f;
+        color: #e0d8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.7;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        background: rgba(18, 14, 34, 0.92);
+        border-bottom: 1px solid rgba(0, 230, 255, 0.25);
+        padding: 16px 24px;
+      }
+      .header-inner {
+        max-width: 860px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .brand {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #00e6ff;
+        text-decoration: none;
+      }
+      .back-link {
+        color: #64ff8c;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+      .back-link:hover { text-decoration: underline; }
+      main {
+        flex: 1;
+        width: 100%;
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 36px 24px 48px;
+      }
+      h1 {
+        font-size: 2rem;
+        color: #00e6ff;
+        margin-bottom: 8px;
+      }
+      .meta {
+        font-size: 0.9rem;
+        color: #9ba5be;
+        margin-bottom: 26px;
+      }
+      h2 {
+        font-size: 1.35rem;
+        color: #ff0080;
+        margin: 28px 0 10px;
+      }
+      p { margin-bottom: 14px; color: #cfc7e0; }
+      ul { margin: 0 0 16px 22px; color: #cfc7e0; }
+      li { margin-bottom: 8px; }
+      a { color: #00e6ff; }
+      .highlight-box {
+        background: rgba(0, 255, 140, 0.08);
+        border: 1px solid rgba(0, 255, 140, 0.35);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 18px 0;
+        color: #dffae9;
+      }
+      footer {
+        padding: 24px 20px;
+        text-align: center;
+        color: #8c82a6;
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .footer-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 10px;
+      }
+      .footer-link-btn {
+        color: #00e6ff;
+        background: none;
+        border: none;
+        font: inherit;
+        cursor: pointer;
+        padding: 0;
+      }
+      .footer-link-btn:hover, footer a:hover { text-decoration: underline; }
+      footer a { color: #00e6ff; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <a class="brand" href="./index.html">Shape-Shift Racer by Sarthak</a>
+        <a class="back-link" href="./index.html">&larr; Back to Game</a>
+      </div>
+    </header>
+
+    <main>
+      <h1>Privacy Policy</h1>
+      <p class="meta">Last updated: 2026 &bull; Applies to Shape-Shift Racer by Sarthak</p>
+
+      <div class="highlight-box">
+        <strong>Camera &amp; Biometric Privacy Guarantee:</strong> Webcam access is 100% optional. If you choose to enable facial controls, all face landmark and expression processing runs locally inside your browser using self-hosted WebAssembly. <strong>No camera frames, images, video, or facial measurements are ever recorded, stored, or sent to any server.</strong>
+      </div>
+
+      <h2>1. Camera &amp; Facial Tracking Data</h2>
+      <p>
+        Shape-Shift Racer by Sarthak offers optional head-pose steering and facial expression morphing powered by Google MediaPipe Tasks Vision running entirely on your own device. When you click "Enable Camera", your browser streams video frames directly to the local WebAssembly model in memory to calculate momentary head pose and smile/mouth-open intensities. Frames are discarded immediately after each inference tick. You can revoke camera permission or turn off the camera at any time via the Pause menu or your browser's address bar.
+      </p>
+
+      <h2>2. Local Browser Storage (Essential Storage)</h2>
+      <p>
+        To preserve your gameplay experience without requiring accounts or logins, the site stores small JSON entries strictly inside your browser's <code>localStorage</code>:
+      </p>
+      <ul>
+        <li><code>ssr_highscores</code> — Your local Top-5 high scores, distance, coins, and max streak.</li>
+        <li><code>ssr_settings</code> — Your audio mute preference and smile/mouth/steering sensitivity sliders.</li>
+        <li><code>ssr_vision_calibration</code> — Numeric baseline offsets from optional face calibration (no images or landmarks).</li>
+        <li><code>ssr_cookie_consent_v1</code> — Your cookie consent preference (Accepted or Rejected).</li>
+      </ul>
+      <p>You can clear all locally stored data at any time through your browser settings.</p>
+
+      <h2>3. Cookies &amp; Advertising (EEA / UK Compliance)</h2>
+      <p>
+        This website is prepared to display Google AdSense advertisements only after approval and only when advertising is explicitly enabled. For visitors in the European Economic Area (EEA) and the United Kingdom (UK), a cookie consent banner is displayed so that advertising cookies and scripts remain strictly disabled unless you explicitly select <strong>Accept Cookies</strong>.
+      </p>
+      <p>
+        If advertising is enabled and you consent, Google and its partners may use cookies to serve and measure ads in accordance with Google's Privacy &amp; Terms. You may withdraw or change your consent at any time by clicking <strong>Cookie Preferences</strong> in the footer of any page.
+      </p>
+
+      <h2>4. Third-Party Assets</h2>
+      <p>
+        All game code, procedural audio, and MediaPipe WebAssembly / model files (<code>face_landmarker.task</code>) are self-hosted with the site so normal gameplay requires zero third-party CDNs or analytics trackers.
+      </p>
+
+      <h2>5. Your Privacy Rights &amp; Contact</h2>
+      <p>
+        Depending on your jurisdiction (including GDPR in the EEA and UK GDPR in the UK), you have the right to access, delete, or restrict processing of personal data and to withdraw cookie consent at any time. Because this game does not operate user accounts or collect server-side personal profiles, clearing your browser storage removes all saved game data immediately.
+      </p>
+      <p>
+        For privacy questions or requests, please contact: <strong><a href="mailto:shapeshifttracer@gmail.com" style="color: #00e6ff;">shapeshifttracer@gmail.com</a></strong>.
+      </p>
+    </main>
+
+    <footer>
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <a href="./index.html">Play Game</a>
+        <a href="./about.html">About</a>
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Use</a>
+        <a href="./credits.html">Credits &amp; Licenses</a>
+        <a href="./contact.html">Contact</a>
+        <button id="btn-cookie-settings" class="footer-link-btn" type="button">Cookie Preferences</button>
+      </nav>
+      <p>&copy; 2026 Shape-Shift Racer by Sarthak.</p>
+    </footer>
+
+    <script type="module" src="./src/pages.ts"></script>
+  </body>
+</html>

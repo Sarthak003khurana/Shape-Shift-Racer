@@ -32,6 +32,9 @@ export class Car implements RenderableCar {
   public targetW: number;
   public targetH: number;
 
+  public screenWidth: number = SCREEN_WIDTH;
+  public screenHeight: number = SCREEN_HEIGHT;
+
   public screenX: number = SCREEN_WIDTH / 2.0;
   public screenY: number = SCREEN_HEIGHT - 65;
   public groundY: number = SCREEN_HEIGHT - 65;
@@ -93,6 +96,17 @@ export class Car implements RenderableCar {
     return false;
   }
 
+  public setDimensions(width: number, height: number): void {
+    this.screenWidth = width;
+    this.screenHeight = height;
+    const baseY = height - (width < height ? 130 : 65);
+    this.groundY = baseY;
+    if (this.jumpY <= 1.0) {
+      this.screenY = baseY;
+    }
+    this.screenX = width / 2.0;
+  }
+
   public reset(baseY?: number): void {
     this.normX = 0.0;
     this.targetNormX = 0.0;
@@ -103,8 +117,9 @@ export class Car implements RenderableCar {
     this.h = cfg.height;
     this.targetW = this.w;
     this.targetH = this.h;
-    this.screenX = SCREEN_WIDTH / 2.0;
-    this.screenY = baseY !== undefined ? baseY : SCREEN_HEIGHT - 65;
+    const defaultBaseY = this.screenHeight - (this.screenWidth < this.screenHeight ? 130 : 65);
+    this.screenX = this.screenWidth / 2.0;
+    this.screenY = baseY !== undefined ? baseY : defaultBaseY;
     this.groundY = this.screenY;
     this.jumpY = 0.0;
     this.jumpVy = 0.0;

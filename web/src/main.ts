@@ -9,22 +9,44 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from './config';
 import { GameEngine } from './core/engine';
 import { initSiteCompliance } from './compliance/init_site_compliance';
 
-export function setupCanvasScaler(canvas: HTMLCanvasElement): () => void {
+export function setupCanvasScaler(
+  canvas: HTMLCanvasElement,
+  onResize?: (width: number, height: number) => void
+): () => void {
   const resize = () => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
-    canvas.width = Math.floor(SCREEN_WIDTH * dpr);
-    canvas.height = Math.floor(SCREEN_HEIGHT * dpr);
+    const isMobilePortrait =
+      typeof window !== 'undefined' &&
+      window.innerWidth < window.innerHeight &&
+      window.innerWidth <= 800;
+    const targetW = isMobilePortrait ? 720 : SCREEN_WIDTH;
+    const targetH = isMobilePortrait ? 1280 : SCREEN_HEIGHT;
+
+    const dpr = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) || 1, 2.0);
+    canvas.width = Math.floor(targetW * dpr);
+    canvas.height = Math.floor(targetH * dpr);
 
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.imageSmoothingEnabled = true;
     }
+
+    if (onResize) {
+      onResize(targetW, targetH);
+    }
   };
 
   resize();
-  window.addEventListener('resize', resize);
-  return () => window.removeEventListener('resize', resize);
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', resize);
+  }
+  return () => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('orientationchange', resize);
+    }
+  };
 }
 
 function init(): GameEngine | null {
@@ -36,8 +58,10 @@ function init(): GameEngine | null {
     return null;
   }
 
-  setupCanvasScaler(canvas);
   const engine = new GameEngine(canvas);
+  setupCanvasScaler(canvas, (w, h) => {
+    engine.setDimensions(w, h);
+  });
   engine.init();
 
   console.log('[ShapeShiftRacer] Core 2.5D Game Engine initialized successfully.');

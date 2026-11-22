@@ -31,10 +31,35 @@ export class RoadRenderer {
   public targetCurve: number = 0.0;
   private curveTime: number = 0.0;
 
+  public screenWidth: number = SCREEN_WIDTH;
+  public screenHeight: number = SCREEN_HEIGHT;
+  public horizonY: number = HORIZON_Y;
+  public roadHeight: number = SCREEN_HEIGHT - HORIZON_Y;
+  public roadBottomWidth: number = ROAD_BOTTOM_WIDTH;
+  public roadTopWidth: number = ROAD_TOP_WIDTH;
+
   public readonly biomeManager: BiomeManager;
 
   constructor() {
     this.biomeManager = new BiomeManager();
+  }
+
+  public setDimensions(width: number, height: number): void {
+    this.screenWidth = width;
+    this.screenHeight = height;
+    if (width < height) {
+      // Mobile vertical portrait mode (e.g. 720 x 1280)
+      this.horizonY = Math.floor(height * 0.36); // ~460px
+      this.roadHeight = Math.floor(height * 0.58); // ~742px (reaches down to ~1202px)
+      this.roadBottomWidth = Math.floor(width * 0.88); // ~634px
+      this.roadTopWidth = Math.floor(width * 0.16); // ~115px
+    } else {
+      // Desktop / landscape mode (1280 x 720)
+      this.horizonY = HORIZON_Y;
+      this.roadHeight = SCREEN_HEIGHT - HORIZON_Y;
+      this.roadBottomWidth = ROAD_BOTTOM_WIDTH;
+      this.roadTopWidth = ROAD_TOP_WIDTH;
+    }
   }
 
   public reset(): void {
@@ -91,11 +116,10 @@ export class RoadRenderer {
     const rawP = Math.max(0.0, Math.min(1.0, 1.0 - worldZ / MAX_Z));
     const p = Math.pow(rawP, 2.2);
 
-    const roadH = SCREEN_HEIGHT - HORIZON_Y;
-    const screenY = HORIZON_Y + p * roadH;
+    const screenY = this.horizonY + p * this.roadHeight;
 
-    const roadW = ROAD_TOP_WIDTH + (ROAD_BOTTOM_WIDTH - ROAD_TOP_WIDTH) * p;
-    const roadCenterX = SCREEN_WIDTH / 2.0 + this.curveDx(p);
+    const roadW = this.roadTopWidth + (this.roadBottomWidth - this.roadTopWidth) * p;
+    const roadCenterX = this.screenWidth / 2.0 + this.curveDx(p);
     const screenX = roadCenterX + normalizedX * (roadW / 2.0);
 
     return { x: screenX, y: screenY, scale };
@@ -115,16 +139,16 @@ export class RoadRenderer {
     const curbDarkStr = toRgbString(p.curb_dark);
 
     // 1. Sky Gradient
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, HORIZON_Y);
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, this.horizonY);
     skyGrad.addColorStop(0, skyTopStr);
     skyGrad.addColorStop(1, skyBotStr);
     ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, SCREEN_WIDTH, HORIZON_Y);
+    ctx.fillRect(0, 0, this.screenWidth, this.horizonY);
 
     // 2. Parallax Synthwave Sun
     const horizonParallax = Math.floor(this.currentCurve * 55);
-    const sunCenterX = Math.floor(SCREEN_WIDTH / 2.0) + horizonParallax;
-    const sunCenterY = HORIZON_Y - 30;
+    const sunCenterX = Math.floor(this.screenWidth / 2.0) + horizonParallax;
+    const sunCenterY = this.horizonY - 30;
     const sunRadius = 85;
 
     // Glowing halos
@@ -151,43 +175,44 @@ export class RoadRenderer {
 
     // 3. Parallax Mountain Silhouettes (zero object allocation)
     const mShift = Math.floor(this.currentCurve * 35);
+    const w = this.screenWidth;
+    const hy = this.horizonY;
     ctx.fillStyle = mountainStr;
     ctx.beginPath();
-    ctx.moveTo(-80, HORIZON_Y);
-    ctx.lineTo(120 + mShift, HORIZON_Y - 48);
-    ctx.lineTo(260 + mShift, HORIZON_Y - 22);
-    ctx.lineTo(380 + mShift, HORIZON_Y - 64);
-    ctx.lineTo(520 + mShift, HORIZON_Y - 18);
-    ctx.lineTo(680 + mShift, HORIZON_Y - 74);
-    ctx.lineTo(820 + mShift, HORIZON_Y - 32);
-    ctx.lineTo(980 + mShift, HORIZON_Y - 68);
-    ctx.lineTo(1140 + mShift, HORIZON_Y - 28);
-    ctx.lineTo(SCREEN_WIDTH + 80, HORIZON_Y);
+    ctx.moveTo(-80, hy);
+    ctx.lineTo(w * 0.10 + mShift, hy - 48);
+    ctx.lineTo(w * 0.22 + mShift, hy - 22);
+    ctx.lineTo(w * 0.32 + mShift, hy - 64);
+    ctx.lineTo(w * 0.44 + mShift, hy - 18);
+    ctx.lineTo(w * 0.58 + mShift, hy - 74);
+    ctx.lineTo(w * 0.70 + mShift, hy - 32);
+    ctx.lineTo(w * 0.82 + mShift, hy - 68);
+    ctx.lineTo(w * 0.94 + mShift, hy - 28);
+    ctx.lineTo(w + 80, hy);
     ctx.closePath();
     ctx.fill();
 
     // 4. Ground Background below horizon
-    const roadHeight = SCREEN_HEIGHT - HORIZON_Y;
     ctx.fillStyle = groundStr;
-    ctx.fillRect(0, HORIZON_Y, SCREEN_WIDTH, roadHeight);
+    ctx.fillRect(0, hy, this.screenWidth, this.screenHeight - hy);
 
     // 5. Curved Perspective Road Segments (drawn far-to-near: 28 down to 0)
     for (let i = this.numSegments; i >= 0; i--) {
       const p1 = Math.pow(i / this.numSegments, 2.2);
       const p2 = Math.pow((i + 1) / this.numSegments, 2.2);
 
-      const y1 = Math.floor(HORIZON_Y + p1 * roadHeight);
-      const y2 = Math.floor(HORIZON_Y + p2 * roadHeight);
+      const y1 = Math.floor(hy + p1 * this.roadHeight);
+      const y2 = Math.floor(hy + p2 * this.roadHeight);
 
-      if (y2 <= y1 || y1 >= SCREEN_HEIGHT) {
+      if (y2 <= y1 || y1 >= this.screenHeight) {
         continue;
       }
 
-      const w1 = ROAD_TOP_WIDTH + (ROAD_BOTTOM_WIDTH - ROAD_TOP_WIDTH) * p1;
-      const w2 = ROAD_TOP_WIDTH + (ROAD_BOTTOM_WIDTH - ROAD_TOP_WIDTH) * p2;
+      const w1 = this.roadTopWidth + (this.roadBottomWidth - this.roadTopWidth) * p1;
+      const w2 = this.roadTopWidth + (this.roadBottomWidth - this.roadTopWidth) * p2;
 
-      const cx1 = SCREEN_WIDTH / 2.0 + this.curveDx(p1);
-      const cx2 = SCREEN_WIDTH / 2.0 + this.curveDx(p2);
+      const cx1 = this.screenWidth / 2.0 + this.curveDx(p1);
+      const cx2 = this.screenWidth / 2.0 + this.curveDx(p2);
 
       const x1L = Math.floor(cx1 - w1 / 2.0);
       const x1R = Math.floor(cx1 + w1 / 2.0);

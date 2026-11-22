@@ -82,6 +82,10 @@ export class GameEngine {
   public invulnerableTimer: number = 0.0;
   public gameOverCooldown: number = 0.0;
 
+  // Viewport dimensions (dynamic for mobile portrait vs desktop widescreen)
+  public screenWidth: number = SCREEN_WIDTH;
+  public screenHeight: number = SCREEN_HEIGHT;
+
   // Loop control
   private lastFrameTime: number = 0;
   private animFrameId: number | null = null;
@@ -106,6 +110,13 @@ export class GameEngine {
 
     this.highScores = loadHighScores();
     this.highScore = this.highScores.length > 0 ? this.highScores[0].score : 0;
+  }
+
+  public setDimensions(width: number, height: number): void {
+    this.screenWidth = width;
+    this.screenHeight = height;
+    this.road.setDimensions(width, height);
+    this.car.setDimensions(width, height);
   }
 
   public init(): void {
@@ -339,7 +350,7 @@ export class GameEngine {
 
       if (ev.gauntletStarted) {
         this.popups.push(
-          new FloatingPopup('GAUNTLET WAVE!', SCREEN_WIDTH / 2, 210, '#ff50b4', 34, 1.5)
+          new FloatingPopup('GAUNTLET WAVE!', this.screenWidth / 2, 210, '#ff50b4', 34, 1.5)
         );
       }
 
@@ -371,7 +382,7 @@ export class GameEngine {
           this.popups.push(
             new FloatingPopup(
               `STREAK ${this.multiplier}x!`,
-              SCREEN_WIDTH / 2,
+              this.screenWidth / 2,
               260,
               '#ffdc28',
               36,
@@ -527,32 +538,37 @@ export class GameEngine {
       const alpha = 0.55 * (this.screenFlashTimer / 0.20);
       ctx.save();
       ctx.fillStyle = `rgba(255, 0, 0, ${Math.max(0, Math.min(1, alpha))})`;
-      ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      ctx.fillRect(0, 0, this.screenWidth, this.screenHeight);
       ctx.restore();
     }
 
     // 6. HUD Telemetry
-    renderHUD(ctx, {
-      score: this.score,
-      highScore: this.highScore,
-      distance: this.distance,
-      speed: this.speed,
-      coins: this.coins,
-      lives: this.lives,
-      streak: this.streak,
-      multiplier: this.multiplier,
-      biomeName: this.road.biomeManager.currentBiomeName,
-      accentColor: this.road.biomeManager.accentColor,
-      currentShape: this.car.currentShapeKey,
-      isMuted: this.audio.isMuted(),
-    });
+    renderHUD(
+      ctx,
+      {
+        score: this.score,
+        highScore: this.highScore,
+        distance: this.distance,
+        speed: this.speed,
+        coins: this.coins,
+        lives: this.lives,
+        streak: this.streak,
+        multiplier: this.multiplier,
+        biomeName: this.road.biomeManager.currentBiomeName,
+        accentColor: this.road.biomeManager.accentColor,
+        currentShape: this.car.currentShapeKey,
+        isMuted: this.audio.isMuted(),
+      },
+      this.screenWidth,
+      this.screenHeight
+    );
 
     // 7. State Overlays
     const state = this.stateMachine.current;
     if (state === 'START') {
-      renderStartOverlay(ctx);
+      renderStartOverlay(ctx, this.screenWidth, this.screenHeight);
     } else if (state === 'PAUSED') {
-      renderPauseOverlay(ctx, this.audio.isMuted());
+      renderPauseOverlay(ctx, this.audio.isMuted(), this.screenWidth, this.screenHeight);
     } else if (state === 'GAMEOVER') {
       renderGameOverOverlay(
         ctx,
@@ -562,7 +578,9 @@ export class GameEngine {
         this.coins,
         this.highScores,
         this.isNewRecord,
-        this.gameOverCooldown <= 0
+        this.gameOverCooldown <= 0,
+        this.screenWidth,
+        this.screenHeight
       );
     }
   }

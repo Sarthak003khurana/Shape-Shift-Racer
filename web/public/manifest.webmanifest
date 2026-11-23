@@ -1,0 +1,32 @@
+{
+  "name": "Shape-Shift Racer by Sarthak",
+  "short_name": "ShapeShift",
+  "description": "Fast-paced 2.5D synthwave arcade racer with real-time car morphing and on-device AI facial controls.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08040f",
+  "theme_color": "#0a0512",
+  "categories": ["games", "arcade"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

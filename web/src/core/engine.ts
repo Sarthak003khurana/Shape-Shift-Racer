@@ -31,6 +31,7 @@ import {
   renderPauseOverlay,
   renderGameOverOverlay,
 } from '../ui/hud';
+import { ViralShareUI } from '../ui/viral_share';
 
 // Mobile Performance Tuning: In-place array compaction eliminates GC spikes at 60 FPS
 function compactArray<T>(arr: T[], predicate: (item: T) => boolean): void {
@@ -56,6 +57,7 @@ export class GameEngine {
   public readonly audio: WebAudioManager;
   public readonly vision: VisionManager;
   public readonly pauseMenu: PauseMenuUI;
+  public readonly viralShare: ViralShareUI;
 
   // Particle & popup entities
   public sparks: SparkParticle[] = [];
@@ -107,6 +109,7 @@ export class GameEngine {
     this.audio = new WebAudioManager();
     this.vision = new VisionManager();
     this.pauseMenu = new PauseMenuUI();
+    this.viralShare = new ViralShareUI();
 
     this.highScores = loadHighScores();
     this.highScore = this.highScores.length > 0 ? this.highScores[0].score : 0;
@@ -152,6 +155,8 @@ export class GameEngine {
       },
     });
 
+    this.viralShare.mount(container);
+
     this.isRunning = true;
     this.lastFrameTime = performance.now();
     this.loop = this.loop.bind(this);
@@ -168,6 +173,7 @@ export class GameEngine {
     this.audio.destroy();
     this.vision.destroy();
     this.pauseMenu.hide();
+    this.viralShare.destroy();
   }
 
   public resetGame(): void {
@@ -495,6 +501,18 @@ export class GameEngine {
             this.gameOverCooldown = 1.0; // 1.0s cooldown before allowing restart
             this.controls.clearRestart(); // Flush any buffered keys
             this.stateMachine.transition('GAMEOVER');
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+              window.dispatchEvent(
+                new CustomEvent('ssr-gameover-stats', {
+                  detail: {
+                    score: Math.floor(this.score),
+                    distance: Math.floor(this.distance),
+                    maxStreak: this.maxStreak,
+                    coins: this.coins,
+                  },
+                })
+              );
+            }
           }
         }
       }

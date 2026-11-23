@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080414"/>
+      <stop offset="50%" stop-color="#140a28"/>
+      <stop offset="100%" stop-color="#05020a"/>
+    </linearGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00e6ff"/>
+      <stop offset="100%" stop-color="#0088ff"/>
+    </linearGradient>
+    <linearGradient id="neonPink" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff0080"/>
+      <stop offset="100%" stop-color="#ff50a0"/>
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe600"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="108" fill="none" stroke="url(#neonCyan)" stroke-width="8" opacity="0.4"/>
+
+  <!-- Synthwave Solar Disc -->
+  <circle cx="256" cy="220" r="110" fill="url(#sunGrad)"/>
+  <!-- Sun Blinds / Horizontal Cutouts -->
+  <rect x="140" y="235" width="232" height="6" fill="#0c0618"/>
+  <rect x="140" y="250" width="232" height="10" fill="#0c0618"/>
+  <rect x="140" y="268" width="232" height="14" fill="#0c0618"/>
+  <rect x="140" y="290" width="232" height="18" fill="#0c0618"/>
+
+  <!-- Perspective Highway Grid Lines -->
+  <path d="M 60 440 L 452 440" stroke="#ff0080" stroke-width="3" opacity="0.7"/>
+  <path d="M 90 410 L 422 410" stroke="#ff0080" stroke-width="2" opacity="0.5"/>
+  <path d="M 120 385 L 392 385" stroke="#ff0080" stroke-width="1.5" opacity="0.3"/>
+  <path d="M 170 340 L 40 480" stroke="#00e6ff" stroke-width="2.5" opacity="0.6"/>
+  <path d="M 230 340 L 180 480" stroke="#00e6ff" stroke-width="2" opacity="0.4"/>
+  <path d="M 282 340 L 332 480" stroke="#00e6ff" stroke-width="2" opacity="0.4"/>
+  <path d="M 342 340 L 472 480" stroke="#00e6ff" stroke-width="2.5" opacity="0.6"/>
+
+  <!-- Cyber Neon Race Car Body (Isometric/Frontal) -->
+  <g transform="translate(256, 385) scale(1.15)">
+    <!-- Cabin Roof -->
+    <polygon points="-42,-28 42,-28 54,-4 -54,-4" fill="#00e6ff" opacity="0.9"/>
+    <!-- Windshield Glass -->
+    <polygon points="-36,-25 36,-25 46,-6 -46,-6" fill="#0a1a32"/>
+    <!-- Main Chassis -->
+    <polygon points="-78,-4 78,-4 86,22 -86,22" fill="url(#neonPink)"/>
+    <!-- Headlights -->
+    <rect x="-76" y="2" width="24" height="10" rx="3" fill="#ffe600"/>
+    <rect x="52" y="2" width="24" height="10" rx="3" fill="#ffe600"/>
+    <!-- Neon Underglow -->
+    <ellipse cx="0" cy="24" rx="80" ry="8" fill="#00e6ff" opacity="0.6"/>
+  </g>
+</svg>

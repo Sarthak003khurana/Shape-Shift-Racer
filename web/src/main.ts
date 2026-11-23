@@ -75,4 +75,16 @@ if (typeof document !== 'undefined') {
   } else {
     init();
   }
+
+  // Register PWA Service Worker in production
+  if (
+    typeof navigator !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    typeof window !== 'undefined' &&
+    (window.location.protocol === 'https:' || window.location.hostname === 'localhost')
+  ) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
 }

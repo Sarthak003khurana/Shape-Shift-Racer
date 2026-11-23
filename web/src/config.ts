@@ -231,25 +231,25 @@ export interface AdSlotConfig {
 export const AD_SLOTS: Record<'menu' | 'gameOver' | 'belowGame' | 'editorialMid', AdSlotConfig> = {
   menu: {
     id: 'ssr-ad-slot-menu',
-    slotId: envMeta.VITE_ADSENSE_SLOT_MENU || '',
+    slotId: envMeta.VITE_ADSENSE_SLOT_MENU || '7772868480',
     format: 'horizontal',
     label: 'Advertisement',
   },
   gameOver: {
     id: 'ssr-ad-slot-gameover',
-    slotId: envMeta.VITE_ADSENSE_SLOT_GAMEOVER || '',
+    slotId: envMeta.VITE_ADSENSE_SLOT_GAMEOVER || '7772868480',
     format: 'rectangle',
     label: 'Advertisement',
   },
   belowGame: {
     id: 'ssr-ad-slot-below-game',
-    slotId: envMeta.VITE_ADSENSE_SLOT_BELOW_GAME || '',
+    slotId: envMeta.VITE_ADSENSE_SLOT_BELOW_GAME || '7772868480',
     format: 'horizontal',
     label: 'Advertisement',
   },
   editorialMid: {
     id: 'ssr-ad-slot-editorial-mid',
-    slotId: envMeta.VITE_ADSENSE_SLOT_EDITORIAL_MID || '',
+    slotId: envMeta.VITE_ADSENSE_SLOT_EDITORIAL_MID || '7772868480',
     format: 'auto',
     label: 'Advertisement',
   },

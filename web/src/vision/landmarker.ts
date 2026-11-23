@@ -4,7 +4,7 @@
  * Operates at 20-30 Hz throttled inference decoupled from the 60 FPS Canvas render loop.
  */
 
-import { FaceLandmarker, FilesetResolver, FaceLandmarkerResult } from '@mediapipe/tasks-vision';
+import type { FaceLandmarker as FaceLandmarkerType, FaceLandmarkerResult } from '@mediapipe/tasks-vision';
 import { resolveAssetUrl } from '../core/assets';
 
 export interface RawVisionFrame {
@@ -15,8 +15,8 @@ export interface RawVisionFrame {
 }
 
 export class FaceLandmarkerService {
-  private landmarker: FaceLandmarker | null = null;
-  private visionFileset: Awaited<ReturnType<typeof FilesetResolver.forVisionTasks>> | null = null;
+  private landmarker: FaceLandmarkerType | null = null;
+  private visionFileset: any = null;
   private modelPath: string = '';
   private activeDelegate: 'GPU' | 'CPU' | null = null;
   private isInitializing: boolean = false;
@@ -39,6 +39,7 @@ export class FaceLandmarkerService {
       this.modelPath = this.resolveAssetUrl('mediapipe/models/face_landmarker.task');
 
       console.log(`[FaceLandmarker] Initializing WASM from: ${wasmPath}`);
+      const { FaceLandmarker, FilesetResolver } = await import('@mediapipe/tasks-vision');
       this.visionFileset = await FilesetResolver.forVisionTasks(wasmPath);
 
       // Attempt GPU delegate first, fallback to CPU
@@ -94,6 +95,7 @@ export class FaceLandmarkerService {
         this.landmarker = null;
       }
       console.warn('[FaceLandmarker] Runtime GPU error detected; switching to CPU delegate...');
+      const { FaceLandmarker } = await import('@mediapipe/tasks-vision');
       this.landmarker = await FaceLandmarker.createFromOptions(this.visionFileset, {
         baseOptions: {
           modelAssetPath: this.modelPath,
